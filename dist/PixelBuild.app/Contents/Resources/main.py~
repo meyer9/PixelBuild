@@ -1,0 +1,27 @@
+import os, pygame
+from pygame.locals import *
+import spritesheet
+import sound
+from map import Level
+level = Level()
+level.loadFile("level.map")
+pygame.init()
+screen = pygame.display.set_mode((640, 480))
+background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
+pygame.display.set_caption('Game')
+#Create The Backgound
+screen.blit(background, (0, 0))
+clock = pygame.time.Clock()
+level.setTile(1, 1, "3")
+pygame.display.flip()
+def eventchecker():
+	for event in pygame.event.get():
+        if event.type == QUIT:
+            exit()
+while True:
+    background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
+    screen.blit(background, (0, 0))
+    pygame.display.flip()
+    for event in pygame.event.get():
+        		if event.type == QUIT:
+           		exit()
