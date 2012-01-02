@@ -59,7 +59,7 @@ class Level(object):
         if x<30 and x>=0 and y<40 and y>=0:
             self.map[y] = self.map[y][:x] + id + self.map[y][1+x:]
 
-    def writeConfig(self, filename="level.map"):
+    def writeConfig(self, filename):
         config = ConfigObj()
         config.filename=filename
         map1=""

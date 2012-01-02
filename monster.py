@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 def trunc(f, n):
     slen = len('%.*f' % (n, f))
@@ -16,28 +17,30 @@ class Monster(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.topleft=initial_position
 		self.next_update_time = 0
-		self.xspeed = random.randint(-11, 11)
+		self.xspeed = 0
 		self.yspeed = random.randint(-11, 11)
 		self.nextTurnTime=2000
 		self.readyx=0
 
-	def update(self, current_time, bottom):
+	def update(self, current_time, bottom, playerx, playery):
 		if self.next_update_time <= current_time:
-			if self.nextTurnTime <= current_time:
-				self.xspeed=random.randint(-10, 10)
-				self.yspeed=random.randint(-10, 10)
-				self.nextTurnTime+=2000
-			if self.rect.left>0 and self.rect.left<900:
-				self.rect.left+=self.xspeed
-			if self.rect.left<=0:
-				if current_time>=self.readyx:
-					self.xspeed=abs(self.xspeed)
-					self.readyx+=1000
-					self.rect.left=40
-			if self.rect.left>=900:
-				if current_time>=self.readyx:
-					self.xspeed=-abs(self.xspeed)
-					self.readyx+=1000
-					self.rect.left=890
-			if current_time>=self.readyx:
-				self.readyx+=10
+			diffX = float(playerx - self.rect.left)
+			diffY = float(playery - self.rect.top)
+			diffLength = math.sqrt(diffX**2 + diffY**2)
+			try:
+				self.xspeed = diffX / diffLength * 3
+				self.yspeed = diffY / diffLength * 3
+			except ZeroDivisionError:
+				print "YOUR'E DEAD"
+			if self.xspeed>0:
+				if self.level.getTile(trunc((self.rect.left+25)/32,0), trunc((self.rect.top+16)/32,0))["name"]=="floor":
+					self.rect.left+=self.xspeed
+			else:
+				if self.level.getTile(trunc((self.rect.left+12)/32,0), trunc((self.rect.top+16)/32,0))["name"]=="floor":
+					self.rect.left+=self.xspeed
+			if self.yspeed>0:
+				if self.level.getTile(trunc((self.rect.left+16)/32,0), trunc((self.rect.top+25)/32,0))["name"]=="floor":
+					self.rect.top+=self.yspeed
+			else:
+				if self.level.getTile(trunc((self.rect.left+16)/32,0), trunc((self.rect.top+4)/32,0))["name"]=="floor":
+					self.rect.top+=self.yspeed

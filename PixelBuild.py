@@ -60,9 +60,9 @@ if running:
     pygame.display.flip()
     #spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.Rect(32, 96, 32, 32))
     monsters=[]
-    monsternum=1
+    monsternum=4
     for i in range(monsternum):
-        monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(32, 96, 32, 32), colorkey = (255, 255, 255)), 5, [100, 100], level))
+        monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(32, 96, 32, 32), colorkey = (255, 255, 255)), 5, [random.randint(10, 900), random.randint(10, 1270)], level))
     defaultmap="""
 [level]
 map = '''777777777777777777777777777777
@@ -196,7 +196,7 @@ while running:
     pygame.display.flip()
     chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
     for mon in monsters:
-        mon.update(time, 150)
+        mon.update(time, 150, playerx, playery)
     background.fill(0)
     background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
     for mon in monsters:
