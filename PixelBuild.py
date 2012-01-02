@@ -2,7 +2,7 @@ import os, pygame
 from pygame.locals import *
 import spritesheet
 import sound
-import time
+import time as time1
 import math
 import random
 from monster import Monster
@@ -60,9 +60,14 @@ if running:
     pygame.display.flip()
     #spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.Rect(32, 96, 32, 32))
     monsters=[]
-    monsternum=4
-    for i in range(monsternum):
-        monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(32, 96, 32, 32), colorkey = (255, 255, 255)), 5, [random.randint(10, 900), random.randint(10, 1270)], level))
+    monsternum=10
+    if level.monsters=={}:
+        for i in range(monsternum):
+            monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(32, 96, 32, 32), colorkey = (255, 255, 255)), 5, [random.randint(10, 900), random.randint(10, 1270)], level))
+    else:
+        for mon in level.monsters:
+            monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(32, 96, 32, 32), colorkey = (255, 255, 255)), 5, [int(level.monsters[mon]["x"]), int(level.monsters[mon]["y"])], level))
+    print len(monsters)
     defaultmap="""
 [level]
 map = '''777777777777777777777777777777
@@ -205,7 +210,7 @@ while running:
     for event in pygame.event.get():
         if event.type==QUIT:
             chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-            level.writeConfig("level"+"".join(chunk1)+".map")
+            level.writeConfig("level"+"".join(chunk1)+".map", monsters)
             pygame.quit()
             running=False
             break
@@ -239,7 +244,7 @@ while running:
                     else:
                         chunk=chunkb
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        level.writeConfig("level"+"".join(chunk1)+".map")
+                        level.writeConfig("level"+"".join(chunk1)+".map", monsters)
                         if chunk[2]==0:
                             chunk=[chunk[0]+1, chunk[1], chunk[2], chunk[3]]
                         else:
@@ -278,7 +283,8 @@ while running:
                     else:
                         chunk=chunkb
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        level.writeConfig("level"+"".join(chunk1)+".map")
+                        
+                        Config("level"+"".join(chunk1)+".map", monsters)
                         if chunk[0]==0:
                             chunk=[chunk[0], chunk[1], chunk[2]+1, chunk[3]]
                         else:
@@ -317,7 +323,7 @@ while running:
                     else:
                         chunk=chunkb
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        level.writeConfig("level"+"".join(chunk1)+".map")
+                        level.writeConfig("level"+"".join(chunk1)+".map", monsters)
                         if chunk[3]==0:
                             chunk=[chunk[0], chunk[1]+1, chunk[2], chunk[3]]
                         else:
@@ -357,7 +363,7 @@ while running:
                     else:
                         chunk=chunkb
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        level.writeConfig("level"+"".join(chunk1)+".map")
+                        level.writeConfig("level"+"".join(chunk1)+".map", monsters)
                         if chunk[1]==0:
                             chunk=[chunk[0], chunk[1], chunk[2], chunk[3]+1]
                         else:
