@@ -8,7 +8,7 @@ Usage:
 from setuptools import setup
 
 APP = ['PixelBuild.py']
-DATA_FILES = ['configobj.py',
+DATA_FILES = [
  'game.bmp',
  'level0000.map',
  'map.py',

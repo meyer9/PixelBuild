@@ -1,10 +1,10 @@
+import random
 import os, pygame
 from pygame.locals import *
 import spritesheet
 import sound
 import time as time1
 import math
-import random
 from monster import Monster
 from map import Level
 waiting = True
@@ -60,7 +60,7 @@ if running:
     pygame.display.flip()
     #spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.Rect(32, 96, 32, 32))
     monsters=[]
-    monsternum=10
+    monsternum=1000
     if level.monsters=={}:
         for i in range(monsternum):
             monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(32, 96, 32, 32), colorkey = (255, 255, 255)), 5, [random.randint(10, 900), random.randint(10, 1270)], level))

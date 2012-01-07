@@ -7,6 +7,7 @@ class Level(object):
     def loadFile(self, filename="level.map"):
         self.map = []
         self.key = {}
+        self.monsters = {}
         parser = ConfigParser.ConfigParser()
         parser.read(filename)
         self.tileset = parser.get("level", "tileset")
@@ -15,8 +16,9 @@ class Level(object):
             if len(section)<4 and section.startswith("player")!=True:
                 desc = dict(parser.items(section))
                 self.key[section] = desc
-            elif section.startswith("player"):
-                print "Yeah"
+            elif section.startswith("mon"):
+                desc = dict(parser.items(section))
+                self.monsters[section] = desc
         self.width = len(self.map[0])
         self.height = len(self.map)
 
@@ -59,10 +61,14 @@ class Level(object):
         if x<30 and x>=0 and y<40 and y>=0:
             self.map[y] = self.map[y][:x] + id + self.map[y][1+x:]
 
-    def writeConfig(self, filename="level.map"):
+    def writeConfig(self, filename, monsters):
         config = ConfigObj()
         config.filename=filename
         map1=""
+        index=0
+        for mon in monsters:
+            config["mon"+str(index)]={"x":mon.rect.left, "y":mon.rect.top}
+            index+=1
         for y in self.map:
             map1=map1+y+"\n    "
         config["level"]={"tileset":"abc", "map":map1}
