@@ -27,21 +27,24 @@ class Monster(pygame.sprite.Sprite):
 			diffX = float(playerx - self.rect.left)+2
 			diffY = float(playery - self.rect.top)+2
 			diffLength = math.sqrt(diffX**2 + diffY**2)
-			if diffLength/32<5:
-				try:
+			if diffLength/32<7:
+				if diffLength>5:
 					self.xspeed = diffX / diffLength * 3
 					self.yspeed = diffY / diffLength * 3
-				except ZeroDivisionError:
-					print "YOUR'E DEAD"
-				if self.xspeed>0:
-					if self.level.getTile(trunc((self.rect.left+25)/32,0), trunc((self.rect.top+16)/32,0))["name"]=="floor":
-						self.rect.left+=self.xspeed
 				else:
-					if self.level.getTile(trunc((self.rect.left+12)/32,0), trunc((self.rect.top+16)/32,0))["name"]=="floor":
-						self.rect.left+=self.xspeed
-				if self.yspeed>0:
-					if self.level.getTile(trunc((self.rect.left+16)/32,0), trunc((self.rect.top+25)/32,0))["name"]=="floor":
-						self.rect.top+=self.yspeed
-				else:
-					if self.level.getTile(trunc((self.rect.left+16)/32,0), trunc((self.rect.top+4)/32,0))["name"]=="floor":
-						self.rect.top+=self.yspeed
+					return 0
+				try:
+					if self.xspeed>0:
+						if self.level.getTile(trunc((self.rect.left+25)/32,0), trunc((self.rect.top+16)/32,0))["name"]=="floor":
+							self.rect.left+=self.xspeed
+					else:
+						if self.level.getTile(trunc((self.rect.left+12)/32,0), trunc((self.rect.top+16)/32,0))["name"]=="floor":
+							self.rect.left+=self.xspeed
+					if self.yspeed>0:
+						if self.level.getTile(trunc((self.rect.left+16)/32,0), trunc((self.rect.top+25)/32,0))["name"]=="floor":
+							self.rect.top+=self.yspeed
+					else:
+						if self.level.getTile(trunc((self.rect.left+16)/32,0), trunc((self.rect.top+4)/32,0))["name"]=="floor":
+							self.rect.top+=self.yspeed
+				except:
+					pass

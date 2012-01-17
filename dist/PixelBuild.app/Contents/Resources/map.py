@@ -61,25 +61,21 @@ class Level(object):
         if x<30 and x>=0 and y<40 and y>=0:
             self.map[y] = self.map[y][:x] + id + self.map[y][1+x:]
 
-    def writeConfig(self, filename, monsters):
+    def writeConfig(self, filename, monsters, savemon=True):
         config = ConfigObj()
         config.filename=filename
         map1=""
         index=0
-        for mon in monsters:
-            config["mon"+str(index)]={"x":mon.rect.left, "y":mon.rect.top}
-            index+=1
+        if savemon:
+            for mon in monsters:
+                config["mon"+str(index)]={"x":mon.rect.left, "y":mon.rect.top}
+                index+=1
         for y in self.map:
             map1=map1+y+"\n    "
         config["level"]={"tileset":"abc", "map":map1}
         config.write()
         level123 = open(filename, 'r').read()
         open(filename, 'w').write(level123[:level123.find("tileset = abc")]+"""tileset = abc
-
-
-[d]
-name = door
-tile = 1, 4
 
 [1]
 name = wall
@@ -97,8 +93,12 @@ tile = 3, 1
 name = wall
 tile = 4, 1
 
-[5]
+[q]
 name = pool
+tile = 4, 8
+
+[5]
+name = wall
 tile = 1, 2
 
 [6]

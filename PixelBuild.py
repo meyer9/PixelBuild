@@ -1,5 +1,5 @@
 import random
-import os, pygame
+import os, pygame, sys
 from pygame.locals import *
 import spritesheet
 import sound
@@ -52,7 +52,7 @@ while waiting:
 if running:
     background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
     pygame.display.set_caption('PixelBuild')
-    character=spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(64, 64, 32, 32), colorkey = (255, 255, 255))
+    character=spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(96,64, 32, 32), colorkey = (255, 255, 255))
     #Create The Backgound
     background.blit(character, (400, 300))
     screen.blit(background, (-100, -100))
@@ -60,14 +60,13 @@ if running:
     pygame.display.flip()
     #spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.Rect(32, 96, 32, 32))
     monsters=[]
-    monsternum=1000
+    monsternum=10
     if level.monsters=={}:
         for i in range(monsternum):
-            monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(32, 96, 32, 32), colorkey = (255, 255, 255)), 5, [random.randint(10, 900), random.randint(10, 1270)], level))
+            monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(96, 288, 32, 32), colorkey = (255, 255, 255)), 5, [random.randint(10, 900), random.randint(10, 1270)], level))
     else:
         for mon in level.monsters:
-            monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(32, 96, 32, 32), colorkey = (255, 255, 255)), 5, [int(level.monsters[mon]["x"]), int(level.monsters[mon]["y"])], level))
-    print len(monsters)
+            monsters.append(Monster(spritesheet.spritesheet("spritesheet.bmp").image_at(pygame.rect.Rect(96, 288, 32, 32), colorkey = (255, 255, 255)), 5, [int(level.monsters[mon]["x"]), int(level.monsters[mon]["y"])], level))
     defaultmap="""
 [level]
 map = '''777777777777777777777777777777
@@ -115,11 +114,6 @@ map = '''777777777777777777777777777777
     '''
 tileset = abc
 
-
-[d]
-name = door
-tile = 1, 4
-
 [1]
 name = wall
 tile = 1, 1
@@ -136,8 +130,12 @@ tile = 3, 1
 name = wall
 tile = 4, 1
 
-[5]
+[q]
 name = pool
+tile = 4, 8
+
+[5]
+name = wall
 tile = 1, 2
 
 [6]
@@ -166,8 +164,9 @@ tile = 2, 3
     selected=""
     monsterspeed=7
     monsterdirection=random.randint(0,4)
-    inv=[1,2,3,4,5,6,7,8,9,0,"d"]
-    currentselected=6
+    inv=[]
+    inv=['1', '2', '3', '4', '5', '6', '7', '8', '9','0', 'q']
+    currentselected=1
     def trunc(f, n):
         slen = len('%.*f' % (n, f))
         try:
@@ -182,7 +181,10 @@ tile = 2, 3
     currentbox=pygame.Surface((48, 64))
     currentbox.fill((255,255,255))
     running=True
+    dead=False
 while running:
+    if dead:
+        break
     time = pygame.time.get_ticks() 
     pygame.display.update()
     screen.fill(0)
@@ -199,10 +201,12 @@ while running:
     screen.blit(currentbox, (0, 536))
     screen.blit(character, (400, 300))
     pygame.display.flip()
+    if not dead:
+        background.fill(0)
     chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
     for mon in monsters:
-        mon.update(time, 150, playerx, playery)
-    background.fill(0)
+        if mon.update(time, 150, playerx, playery)==0:
+            dead=True
     background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
     for mon in monsters:
         background.blit(mon.image, (mon.rect[0],mon.rect[1]))
@@ -224,6 +228,7 @@ while running:
                         yoffset+=3
                         playery-=3
                 except KeyError:
+                    
                     #1280, -980, 2
                     screen.fill(0)
                     playery=1280
@@ -236,7 +241,6 @@ while running:
                     chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                     if os.path.exists("level"+"".join(chunk1)+".map")!=True:
                         open("level"+"".join(chunk1)+".map","w").write(defaultmap)
-                        level.loadFile("level"+"".join(chunk1)+".map")
                         background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
                         screen.blit(background, (0+xoffset, 0+yoffset))
                         screen.blit(character, (400, 300))
@@ -244,7 +248,7 @@ while running:
                     else:
                         chunk=chunkb
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        level.writeConfig("level"+"".join(chunk1)+".map", monsters)
+                        level.writeConfig("level"+"".join(chunk1)+".map", [])
                         if chunk[2]==0:
                             chunk=[chunk[0]+1, chunk[1], chunk[2], chunk[3]]
                         else:
@@ -255,6 +259,7 @@ while running:
                         screen.blit(background, (0+xoffset, 0+yoffset))
                         screen.blit(character, (400, 300))
                         pygame.display.flip()
+                        
             if event.key == K_s:
                 try:
                     if level.getTile(trunc((playerx+16)/32,0), trunc((playery+25)/32,0))["name"]=="floor":
@@ -284,7 +289,7 @@ while running:
                         chunk=chunkb
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                         
-                        Config("level"+"".join(chunk1)+".map", monsters)
+                        level.writeConfig("level"+"".join(chunk1)+".map", [])
                         if chunk[0]==0:
                             chunk=[chunk[0], chunk[1], chunk[2]+1, chunk[3]]
                         else:
@@ -323,7 +328,7 @@ while running:
                     else:
                         chunk=chunkb
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        level.writeConfig("level"+"".join(chunk1)+".map", monsters)
+                        level.writeConfig("level"+"".join(chunk1)+".map", [])
                         if chunk[3]==0:
                             chunk=[chunk[0], chunk[1]+1, chunk[2], chunk[3]]
                         else:
@@ -363,7 +368,7 @@ while running:
                     else:
                         chunk=chunkb
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        level.writeConfig("level"+"".join(chunk1)+".map", monsters)
+                        level.writeConfig("level"+"".join(chunk1)+".map", [])
                         if chunk[1]==0:
                             chunk=[chunk[0], chunk[1], chunk[2], chunk[3]+1]
                         else:
@@ -396,17 +401,13 @@ while running:
                 currentselected=0
         #4 is down and 5 is up
         if event.type == MOUSEBUTTONDOWN and event.button==4:
-            if currentselected==1:
-                currentselected=0
-            elif currentselected==0:
-                currentselected=9
+            if currentselected==0:
+                currentselected=11
             else:
                 currentselected-=1
         elif event.type == MOUSEBUTTONDOWN and event.button==5:
-            if currentselected==9:
+            if currentselected==11:
                 currentselected=0
-            elif currentselected==0:
-                currentselected=1
             else:
                 currentselected+=1
         elif event.type==MOUSEBUTTONDOWN and event.button==1:
@@ -419,4 +420,41 @@ while running:
             level.setTile(trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), "7")
             background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
             screen.blit(background, (0+xoffset, 0+yoffset))
-        
+once = 1
+while 1:
+    if once>0:
+        n =  screen.convert_alpha()
+        # red at 50%
+        n.fill((255,0,0,127))
+        screen.blit(n, (0,0))
+        pygame.display.flip()
+        once-=1
+    font1 = pygame.font.Font(None, 72)
+    text1 = font1.render('Game Over', True, (255, 255, 255))
+    textRect1 = text1.get_rect()
+    textRect1.centerx = screen.get_rect().centerx
+    textRect1.y = 100
+    screen.blit(text1, textRect1)
+
+    # Add "Press <Enter> To Play"
+    font2 = pygame.font.Font(None, 17)
+    text2 = font2.render('Press <Enter> To Quit', True, (255, 255, 255))
+    textRect2 = text2.get_rect()
+    textRect2.centerx = screen.get_rect().centerx
+    textRect2.y = 150
+    screen.blit(text2, textRect2)
+    pygame.display.flip()
+    for event in pygame.event.get():
+        if event.type==QUIT:
+            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+            level.writeConfig("level"+"".join(chunk1)+".map", monsters, False)
+            pygame.quit()
+            running=False
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                level.writeConfig("level"+"".join(chunk1)+".map", monsters, False)
+                pygame.quit()
+                running=False
+                sys.exit()
