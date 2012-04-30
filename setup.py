@@ -6,15 +6,21 @@ Usage:
 """
 
 from setuptools import setup
-
+import sys
+sys.argv.append("py2app")
 APP = ['PixelBuild.py']
 DATA_FILES = [
+ 'PB.pyc',
+ 'default.map',
  'game.bmp',
- 'level0000.map',
+ 'shop.bmp',
+ 'Courier.ttf',
  'map.py',
- 'pygame/',
  'spritesheet.bmp',
- 'spritesheet.py']
+ 'spritesheet.py',
+ 'delete.wav', 
+ 'place.wav', 
+ 'time.so']
 OPTIONS = {'argv_emulation': False}
 
 setup(

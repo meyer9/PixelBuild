@@ -1,0 +1,51 @@
+[player]
+y = 900
+x = 575
+inventory = 100, 100, 100, 101, 100, 100, 100, 100, 100, 100, 85, 0, 0, 0, 1, 0, 5, 8, 0
+[mon0]
+y = 178
+x = 1125
+[level]
+map = '''g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;le;le;le;g;g;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;le;le;le;le;le;le;le;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;le;le;le;le;le;le;le;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;le;le;le;g;g;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;w;g;g;g;g;w;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;w;g;g;g;g;w;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;le;le;le;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;le;le;le;le;le;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;le;le;le;le;le;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;le;le;le;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;w;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;w;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;le;le;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;le;le;le;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;le;le;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;le;le;le;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;w;w;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;w;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g;g
+    '''
+tileset = abc

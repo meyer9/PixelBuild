@@ -20,43 +20,54 @@ def run():
     pygame.init()
 
     fontdir = os.path.dirname(os.path.abspath (__file__))
-    font = freetype.Font(os.path.join (fontdir, "data", "sans.ttf"))
+    face = freetype.Face(os.path.join (fontdir, "data", "sans.ttf"))
 
     screen = pygame.display.set_mode((800, 600))
     screen.fill (colors["grey_light"])
 
-    font.render((screen, 32, 32), "Hello World", colors["red"], colors['grey_dark'],
-            ptsize=64, style=freetype.STYLE_UNDERLINE|freetype.STYLE_ITALIC)
+    face.render((screen, 32, 32), "Hello World", colors["red"], colors['grey_dark'],
+            ptsize=64, style=freetype.STYLE_UNDERLINE|freetype.STYLE_OBLIQUE)
 
-    font.render((screen, 32, 128), "abcdefghijklm", colors["grey_dark"], colors["green"],
+    face.render((screen, 32, 128), "abcdefghijklm", colors["grey_dark"], colors["green"],
             ptsize=64)
 
-    font.vertical = True
-    font.render((screen, 32, 190), "Vertical?", colors["blue"], None, ptsize=32)
-    font.vertical = False
+    face.vertical = True
+    face.render((screen, 32, 190), "Vertical?", colors["blue"], None, ptsize=32)
+    face.vertical = False
 
-    font.render((screen, 64, 190), "Let's spin!", colors["red"], None,
+    face.render((screen, 64, 190), "Let's spin!", colors["red"], None,
             ptsize=48, rotation=55)
 
-    font.render((screen, 150, 270), "All around!", colors["green"], None,
+    face.render((screen, 160, 290), "All around!", colors["green"], None,
             ptsize=48, rotation=-55)
 
-    font.render((screen, 250, 220), "and BLEND", pygame.Color(255, 0, 0, 128), None,
+    face.render((screen, 250, 220), "and BLEND", pygame.Color(255, 0, 0, 128), None,
             ptsize=64)
 
-    font.render((screen, 258, 237), "or BLAND!", pygame.Color(0, 0xCC, 28, 128), None,
+    face.render((screen, 258, 237), "or BLAND!", pygame.Color(0, 0xCC, 28, 128), None,
             ptsize=64)
+
+    face.origin = True
+    for angle in range(0, 360, 45):
+        face.render((screen, 200, 500), ")", pygame.Color('black'),
+                    ptsize=48, rotation=angle)
+    face.vertical = True
+    for angle in range(15, 375, 30):
+        face.render((screen, 600, 400), "|^*", pygame.Color('orange'),
+                    ptsize=48, rotation=angle)
+    face.vertical = False
+    face.origin = False
 
     utext = pygame.compat.as_unicode(r"I \u2665 Unicode")
-    font.render((screen, 298, 320), utext, pygame.Color(0, 0xCC, 0xDD), None,
+    face.render((screen, 298, 320), utext, pygame.Color(0, 0xCC, 0xDD), None,
             ptsize=64)
 
     utext = pygame.compat.as_unicode(r"\u2665")
-    font.render((screen, 480, 32), utext, colors["grey_light"], colors["red"],
+    face.render((screen, 480, 32), utext, colors["grey_light"], colors["red"],
             ptsize=148)
 
-    font.render((screen, 380, 380), "...yes, this is an SDL surface", pygame.Color(0, 0, 0), None,
-            ptsize=24, style=freetype.STYLE_BOLD)
+    face.render((screen, 380, 380), "...yes, this is an SDL surface", pygame.Color(0, 0, 0), None,
+            ptsize=24, style=freetype.STYLE_STRONG)
 
     pygame.display.flip()
 

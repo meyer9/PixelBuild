@@ -17,34 +17,25 @@ class Monster(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.topleft=initial_position
 		self.next_update_time = 0
-		self.xspeed = 0
-		self.yspeed = random.randint(-11, 11)
+		if random.randint(0,1)==0:
+			self.xspeed=-4
+		else:
+			self.xspeed=4
+		if random.randint(0,1)==0:
+			self.yspeed=-4
+		else:
+			self.yspeed=4
 		self.nextTurnTime=2000
 		self.readyx=0
+		self.speed=4
 
-	def update(self, current_time, bottom, playerx, playery):
-		if self.next_update_time <= current_time:
-			diffX = float(playerx - self.rect.left)+2
-			diffY = float(playery - self.rect.top)+2
-			diffLength = math.sqrt(diffX**2 + diffY**2)
-			if diffLength/32<7:
-				if diffLength>5:
-					self.xspeed = diffX / diffLength * 3
-					self.yspeed = diffY / diffLength * 3
-				else:
-					return 0
-				try:
-					if self.xspeed>0:
-						if self.level.getTile(trunc((self.rect.left+25)/32,0), trunc((self.rect.top+16)/32,0))["name"]=="floor":
-							self.rect.left+=self.xspeed
-					else:
-						if self.level.getTile(trunc((self.rect.left+12)/32,0), trunc((self.rect.top+16)/32,0))["name"]=="floor":
-							self.rect.left+=self.xspeed
-					if self.yspeed>0:
-						if self.level.getTile(trunc((self.rect.left+16)/32,0), trunc((self.rect.top+25)/32,0))["name"]=="floor":
-							self.rect.top+=self.yspeed
-					else:
-						if self.level.getTile(trunc((self.rect.left+16)/32,0), trunc((self.rect.top+4)/32,0))["name"]=="floor":
-							self.rect.top+=self.yspeed
-				except:
-					pass
+	def update(self, current_time, bottom, playerx, playery, timing):
+		diffX = float(playerx - self.rect.left)+2
+		diffY = float(playery - self.rect.top)+2
+		diffLength = math.sqrt(diffX**2 + diffY**2)
+		if False: #diffLength<7*32
+			if diffLength>5:
+			 	self.xspeed = diffX / diffLength * self.speed
+			 	self.yspeed = diffY / diffLength * self.speed
+			else:
+			 	return 0

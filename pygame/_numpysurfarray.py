@@ -46,12 +46,13 @@ with 16bit data will be treated as unsigned integers.
 
 import pygame
 from pygame.compat import bytes_
-from pygame._arraysurfarray import blit_array
+from pygame.pixelcopy import array_to_surface, surface_to_array
+from pygame.pixelcopy import map_array as pix_map_array
 import numpy
+from numpy import array as numpy_array, empty as numpy_empty
 
-
-def array2d (surface):
-    """pygame.numpyarray.array2d (Surface): return array
+def array2d(surface):
+    """pygame.numpyarray.array2d(Surface): return array
 
     copy pixels into a 2d array
 
@@ -63,36 +64,18 @@ def array2d (surface):
     (see the Surface.lock - lock the Surface memory for pixel access
     method).
     """
-    bpp = surface.get_bytesize ()
-    if bpp <= 0 or bpp > 4:
-        raise ValueError("unsupported bit depth for 2D array")
-
-    size = surface.get_size ()
-    width, height = size
-    
-    # Taken from Alex Holkner's pygame-ctypes package. Thanks a lot.
-    data = numpy.frombuffer (surface.get_buffer (), numpy.uint8)
-    pitch = surface.get_pitch ()
-    row_size = width * bpp
-    if pitch != row_size:
-        data.shape = (height, pitch)
-        data = data[:, 0:row_size]
-
-    dtype = (None, numpy.uint8, numpy.uint16, numpy.int32, numpy.int32)[bpp]
-    array = numpy.zeros (size, dtype, 'F')
-    array_data = numpy.frombuffer (array, numpy.uint8)
-    if bpp == 3:
-        data.shape = (height, width, 3)
-        array_data.shape = (height, width, 4)
-        array_data[:,:,:3] = data[...]
-    else:
-        data.shape = (height, row_size)
-        array_data.shape = (height, row_size)
-        array_data[...] =  data[...]
+    bpp = surface.get_bytesize()
+    try:
+        dtype = (numpy.uint8, numpy.uint16, numpy.int32, numpy.int32)[bpp - 1]
+    except IndexError:
+        raise ValueError("unsupported bit depth %i for 2D array" % (bpp * 8,))
+    size = surface.get_size()
+    array = numpy.empty(size, dtype)
+    surface_to_array(array, surface)
     return array
     
-def pixels2d (surface):
-    """pygame.numpyarray.pixels2d (Surface): return array
+def pixels2d(surface):
+    """pygame.numpyarray.pixels2d(Surface): return array
 
     reference pixels into a 2d array
     
@@ -107,21 +90,14 @@ def pixels2d (surface):
     the array (see the Surface.lock - lock the Surface memory for pixel
     access method).
     """
-    bpp = surface.get_bytesize ()
-    if bpp == 3 or bpp < 1 or bpp > 4:
-        raise ValueError("unsupported bit depth for 2D reference array")
+    try:
+        return numpy_array(surface.get_view('2'), copy=False)
+    except ValueError:
+        raise ValueError("bit depth %i unsupported for 2D reference array" %
+                         (surface.get_bitsize(),))
 
-    typecode = (numpy.uint8, numpy.uint16, None, numpy.int32)[bpp - 1]
-    array = numpy.frombuffer (surface.get_buffer (), typecode)
-    array.shape = surface.get_height (), surface.get_pitch () / bpp
-
-    # Padding correction for certain depth due to padding bytes.
-    array = array[:,:surface.get_width ()]
-    array = numpy.transpose (array)
-    return array
-
-def array3d (surface):
-    """pygame.numpyarray.array3d (Surface): return array
+def array3d(surface):
+    """pygame.numpyarray.array3d(Surface): return array
 
     copy pixels into a 3d array
 
@@ -133,48 +109,13 @@ def array3d (surface):
     (see the Surface.lock - lock the Surface memory for pixel access
     method).
     """
-    bpp = surface.get_bytesize ()
-    array = array2d (surface)
-
-    # Taken from from Alex Holkner's pygame-ctypes package. Thanks a
-    # lot.
-    if bpp == 1:
-        palette = surface.get_palette ()
-        # Resolve the correct values using the color palette
-        pal_r = numpy.array ([c[0] for c in palette])
-        pal_g = numpy.array ([c[1] for c in palette])
-        pal_b = numpy.array ([c[2] for c in palette])
-        planes = [numpy.choose (array, pal_r),
-                  numpy.choose (array, pal_g),
-                  numpy.choose (array, pal_b)]
-        array = numpy.array (planes, numpy.uint8)
-        array = numpy.transpose (array, (1, 2, 0))
-        return array
-    elif bpp == 2:
-        # Taken from SDL_GetRGBA.
-        masks = surface.get_masks ()
-        shifts = surface.get_shifts ()
-        losses = surface.get_losses ()
-        vr = (array & masks[0]) >> shifts[0]
-        vg = (array & masks[1]) >> shifts[1]
-        vb = (array & masks[2]) >> shifts[2]
-        planes = [(vr << losses[0]) + (vr >> (8 - (losses[0] << 1))),
-                  (vg << losses[1]) + (vg >> (8 - (losses[1] << 1))),
-                  (vb << losses[2]) + (vb >> (8 - (losses[2] << 1)))]
-        array = numpy.array (planes, numpy.uint8)
-        return numpy.transpose (array, (1, 2, 0))
-    else:
-        masks = surface.get_masks ()
-        shifts = surface.get_shifts ()
-        losses = surface.get_losses ()
-        planes = [((array & masks[0]) >> shifts[0]), # << losses[0], Assume 0
-                  ((array & masks[1]) >> shifts[1]), # << losses[1],
-                  ((array & masks[2]) >> shifts[2])] # << losses[2]]
-        array = numpy.array (planes, numpy.uint8)
-        return numpy.transpose (array, (1, 2, 0))
+    w, h = surface.get_size()
+    array = numpy.empty((w, h, 3), numpy.uint8)
+    surface_to_array(array, surface)
+    return array
 
 def pixels3d (surface):
-    """pygame.numpyarray.pixels3d (Surface): return array
+    """pygame.numpyarray.pixels3d(Surface): return array
 
     reference pixels into a 3d array
 
@@ -189,46 +130,10 @@ def pixels3d (surface):
     the array (see the Surface.lock - lock the Surface memory for pixel
     access method).
     """
-    bpp = surface.get_bytesize ()
-    if bpp < 3 or bpp > 4:
-        raise ValueError("unsupported bit depth for 3D reference array")
-    lilendian = pygame.get_sdl_byteorder () == pygame.LIL_ENDIAN
+    return numpy_array(surface.get_view('3'), copy=False)
 
-    start = 0
-    step = 0
-
-    # Check for RGB or BGR surface.
-    shifts = surface.get_shifts ()
-    if shifts[0] == 16 and shifts[1] == 8 and shifts[2] == 0:
-        # RGB 
-        if lilendian:
-            start = 2
-            step = -1
-        else:
-            start = 0
-            step = 1
-    elif shifts[2] == 16 and shifts[1] == 8 and shifts[0] == 0:
-        # BGR
-        if lilendian:
-            start = 0
-            step = 1
-        else:
-            start = 2
-            step = -1
-    else:
-        raise ValueError("unsupported colormasks for 3D reference array")
-
-    if bpp == 4 and not lilendian:
-        start += 1
-
-    array = numpy.ndarray \
-            (shape=(surface.get_width (), surface.get_height (), 3),
-             dtype=numpy.uint8, buffer=surface.get_buffer (),
-             offset=start, strides=(bpp, surface.get_pitch (),step))
-    return array
-
-def array_alpha (surface):
-    """pygame.numpyarray.array_alpha (Surface): return array
+def array_alpha(surface):
+    """pygame.numpyarray.array_alpha(Surface): return array
 
     copy pixel alphas into a 2d array
 
@@ -241,31 +146,13 @@ def array_alpha (surface):
     (see the Surface.lock - lock the Surface memory for pixel access
     method).
     """
-    if (surface.get_bytesize () == 1 or
-        surface.get_alpha () is None or
-        surface.get_masks ()[3] == 0):
-        # 1 bpp surfaces and surfaces without per-pixel alpha are always
-        # fully opaque.
-        array = numpy.empty (surface.get_width () * surface.get_height (),
-                             numpy.uint8)
-        array.fill (0xff)
-        array.shape = surface.get_width (), surface.get_height ()
-        return array
-
-    array = array2d (surface)
-    if surface.get_bytesize () == 2:
-        # Taken from SDL_GetRGBA.
-        va = (array & surface.get_masks ()[3]) >> surface.get_shifts ()[3]
-        array = ((va << surface.get_losses ()[3]) +
-                 (va >> (8 - (surface.get_losses ()[3] << 1))))
-    else:
-        # Taken from _numericsurfarray.c.
-        array = array >> surface.get_shifts ()[3] << surface.get_losses ()[3]
-    array = array.astype (numpy.uint8)
+    size = surface.get_size()
+    array = numpy.empty(size, numpy.uint8)
+    surface_to_array(array, surface, 'A')
     return array
 
-def pixels_alpha (surface):
-    """pygame.numpyarray.pixels_alpha (Surface): return array
+def pixels_alpha(surface):
+    """pygame.numpyarray.pixels_alpha(Surface): return array
 
     reference pixel alphas into a 2d array
 
@@ -279,29 +166,109 @@ def pixels_alpha (surface):
     The Surface this array references will remain locked for the
     lifetime of the array.
     """
-    if surface.get_bytesize () != 4:
-        raise ValueError("unsupported bit depth for alpha reference array")
-    lilendian = pygame.get_sdl_byteorder () == pygame.LIL_ENDIAN
+    return numpy.array(surface.get_view('A'), copy=False)
 
-    # ARGB surface.
-    start = 0
-    
-    if surface.get_shifts ()[3] == 24 and lilendian:
-        # RGBA surface.
-        start = 3
-    elif surface.get_shifts ()[3] == 0 and not lilendian:
-        start = 3
-    else:
-        raise ValueError("unsupported colormasks for alpha reference array")
+def pixels_red(surface):
+    """pygame.surfarray.pixels_red(Surface): return array
 
-    array = numpy.ndarray \
-            (shape=(surface.get_width (), surface.get_height ()),
-             dtype=numpy.uint8, buffer=surface.get_buffer (),
-             offset=start, strides=(4, surface.get_pitch ()))
+    Reference pixel red into a 2d array.
+
+    Create a new 2D array that directly references the red values
+    in a Surface. Any changes to the array will affect the pixels
+    in the Surface. This is a fast operation since no data is copied.
+
+    This can only work on 24-bit or 32-bit Surfaces.
+
+    The Surface this array references will remain locked for the
+    lifetime of the array.
+    """
+    return numpy.array(surface.get_view('R'), copy=False)
+
+def array_red(surface):
+    """pygame.numpyarray.array_red(Surface): return array
+
+    copy pixel red into a 2d array
+
+    Copy the pixel red values from a Surface into a 2D array. This will work
+    for any type of Surface format.
+
+    This function will temporarily lock the Surface as pixels are copied
+    (see the Surface.lock - lock the Surface memory for pixel access
+    method).
+    """
+    size = surface.get_size()
+    array = numpy.empty(size, numpy.uint8)
+    surface_to_array(array, surface, 'R')
     return array
 
-def array_colorkey (surface):
-    """pygame.numpyarray.array_colorkey (Surface): return array
+def pixels_green(surface):
+    """pygame.surfarray.pixels_green(Surface): return array
+
+    Reference pixel green into a 2d array.
+
+    Create a new 2D array that directly references the green values
+    in a Surface. Any changes to the array will affect the pixels
+    in the Surface. This is a fast operation since no data is copied.
+
+    This can only work on 24-bit or 32-bit Surfaces.
+
+    The Surface this array references will remain locked for the
+    lifetime of the array.
+    """
+    return numpy.array(surface.get_view('G'), copy=False)
+
+def array_green(surface):
+    """pygame.numpyarray.array_green(Surface): return array
+
+    copy pixel green into a 2d array
+
+    Copy the pixel green values from a Surface into a 2D array. This will work
+    for any type of Surface format.
+
+    This function will temporarily lock the Surface as pixels are copied
+    (see the Surface.lock - lock the Surface memory for pixel access
+    method).
+    """
+    size = surface.get_size()
+    array = numpy.empty(size, numpy.uint8)
+    surface_to_array(array, surface, 'G')
+    return array
+
+def pixels_blue (surface):
+    """pygame.surfarray.pixels_blue(Surface): return array
+
+    Reference pixel blue into a 2d array.
+
+    Create a new 2D array that directly references the blue values
+    in a Surface. Any changes to the array will affect the pixels
+    in the Surface. This is a fast operation since no data is copied.
+
+    This can only work on 24-bit or 32-bit Surfaces.
+
+    The Surface this array references will remain locked for the
+    lifetime of the array.
+    """
+    return numpy.array(surface.get_view('B'), copy=False)
+
+def array_blue(surface):
+    """pygame.numpyarray.array_blue(Surface): return array
+
+    copy pixel blue into a 2d array
+
+    Copy the pixel blue values from a Surface into a 2D array. This will work
+    for any type of Surface format.
+
+    This function will temporarily lock the Surface as pixels are copied
+    (see the Surface.lock - lock the Surface memory for pixel access
+    method).
+    """
+    size = surface.get_size()
+    array = numpy.empty(size, numpy.uint8)
+    surface_to_array(array, surface, 'B')
+    return array
+
+def array_colorkey(surface):
+    """pygame.numpyarray.array_colorkey(Surface): return array
 
     copy the colorkey values into a 2d array
 
@@ -315,88 +282,31 @@ def array_colorkey (surface):
     This function will temporarily lock the Surface as pixels are
     copied.
     """
-    colorkey = surface.get_colorkey ()
-    if colorkey == None:
-        # No colorkey, return a solid opaque array.
-        array = numpy.empty (surface.get_width () * surface.get_height (),
-                             numpy.uint8)
-        array.fill (0xff)
-        array.shape = surface.get_width (), surface.get_height ()
-        return array
-
-    # Taken from from Alex Holkner's pygame-ctypes package. Thanks a
-    # lot.
-    array = array2d (surface)
-    # Check each pixel value for the colorkey and mark it as opaque or
-    # transparent as needed.
-    val = surface.map_rgb (colorkey)
-    array = numpy.choose (numpy.equal (array, val),
-                          (numpy.uint8 (0xff), numpy.uint8 (0)))
-    array.shape = surface.get_width (), surface.get_height ()
+    size = surface.get_size()
+    array = numpy.empty(size, numpy.uint8)
+    surface_to_array(array, surface, 'C')
     return array
 
-def make_surface (array):
-    """pygame.numpyarray.make_surface (array): return Surface
-
-    copy an array to a new surface
-
-    Create a new Surface that best resembles the data and format on the
-    array. The array can be 2D or 3D with any sized integer values.
-    """ 
-    # Taken from from Alex Holkner's pygame-ctypes package. Thanks a
-    # lot.
-    bpp = 0
-    r = g = b = 0
-    shape = array.shape
-    if len (shape) == 2:
-        # 2D array
-        bpp = 8
-        r = 0xFF >> 6 << 5
-        g = 0xFF >> 5 << 2
-        b = 0xFF >> 6
-    elif len (shape) == 3 and shape[2] == 3:
-        bpp = 32
-        r = 0xff << 16
-        g = 0xff << 8
-        b = 0xff
-    else:
-        raise ValueError("must be a valid 2d or 3d array")
-
-    surface = pygame.Surface ((shape[0], shape[1]), 0, bpp, (r, g, b, 0))
-    blit_array (surface, array)
-    return surface
-    
-def map_array (surface, array):
-    """pygame.numpyarray.map_array (Surface, array3d): return array2d
+def map_array(surface, array):
+    """pygame.numpyarray.map_array(Surface, array3d): return array2d
 
     map a 3d array into a 2d array
 
     Convert a 3D array into a 2D array. This will use the given Surface
-    format to control the conversion. Palette surface formats are not
-    supported.
+    format to control the conversion.
 
     Note: arrays do not need to be 3D, as long as the minor axis has
     three elements giving the component colours, any array shape can be
     used (for example, a single colour can be mapped, or an array of
-    colours).
+    colours). The array shape is limited to eleven dimensions maximum,
+    including the three element minor axis.
     """
-    # Taken from from Alex Holkner's pygame-ctypes package. Thanks a
-    # lot.
-    bpp = surface.get_bytesize ()
-    if bpp <= 1 or bpp > 4:
-        raise ValueError("unsupported bit depth for surface array")
-
+    if array.ndim == 0:
+        raise ValueError("array must have at least 1 dimension")
     shape = array.shape
     if shape[-1] != 3:
         raise ValueError("array must be a 3d array of 3-value color data")
+    target = numpy_empty(shape[:-1], numpy.int32)
+    pix_map_array(target, array, surface)
+    return target
 
-    shifts = surface.get_shifts ()
-    losses = surface.get_losses ()
-    if array.dtype != numpy.int32:
-        array = array.astype(numpy.int32)
-    out       = array[...,0] >> losses[0] << shifts[0]
-    out[...] |= array[...,1] >> losses[1] << shifts[1]
-    out[...] |= array[...,2] >> losses[2] << shifts[2]
-    if surface.get_flags() & pygame.SRCALPHA:
-        out[...] |= numpy.int32(255) >> losses[3] << shifts[3]
-    return out

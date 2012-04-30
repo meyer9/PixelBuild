@@ -17,6 +17,7 @@ if is_pygame_pkg:
 else:
     from test.test_utils import test_not_implemented, unittest
 import pygame
+from pygame.compat import as_unicode
 
 ################################################################################
 
@@ -40,6 +41,41 @@ class EventTypeTest(unittest.TestCase):
 
         self.assertEquals(e.some_attr, 1)
         self.assertEquals(e.other_attr, "1")
+
+        # Event now uses tp_dictoffset and tp_members: request 62
+        # on Motherhamster Bugzilla.
+        self.assertEquals(e.type, pygame.USEREVENT)
+        self.assert_(e.dict is e.__dict__)
+        e.some_attr = 12
+        self.assertEquals(e.some_attr, 12)
+        e.new_attr = 15
+        self.assertEquals(e.new_attr, 15)
+
+        # For Python 2.x a TypeError is raised for a readonly member;
+        # for Python 3.x it is an AttributeError.
+        self.assertRaises((TypeError, AttributeError), setattr, e, 'type', 0)
+        self.assertRaises((TypeError, AttributeError), setattr, e, 'dict', None)
+
+        # Ensure attributes are visible to dir(), part of the original
+        # posted request.
+        d = dir(e)
+        self.assert_('type' in d)
+        self.assert_('dict' in d)
+        self.assert_('__dict__' in d)
+        self.assert_('some_attr' in d)
+        self.assert_('other_attr' in d)
+        self.assert_('new_attr' in d)
+
+    def test_as_str(self):
+        # Bug reported on Pygame mailing list July 24, 2011:
+        # For Python 3.x str(event) to raises an UnicodeEncodeError when
+        # an event attribute is a string with a non-ascii character.
+        try:
+            str(pygame.event.Event(1, a=as_unicode(r"\xed")))
+        except UnicodeEncodeError:
+            self.fail("Event object raised exception for non-ascii character")
+        # Passed.
+
 
 race_condition_notification = """
 This test is dependent on timing. The event queue is cleared in preparation for 

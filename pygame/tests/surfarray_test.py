@@ -145,22 +145,22 @@ class SurfarrayModuleTest (unittest.TestCase):
 
         for surf in sources:
             arr = pygame.surfarray.array2d(surf)
-            map_rgb = surf.map_rgb
-            for (x, y), i in self.test_points:
-                self.failUnlessEqual(arr[x, y], map_rgb(palette[i]),
+            for posn, i in self.test_points:
+                self.failUnlessEqual(arr[posn], surf.get_at_mapped(posn),
                                      "%s != %s: flags: %i, bpp: %i, posn: %s" %
-                                     (arr[x, y],
-                                      map_rgb(palette[i]),
+                                     (arr[posn],
+                                      surf.get_at_mapped(posn),
                                       surf.get_flags(), surf.get_bitsize(),
-                                      (x, y)))
+                                      posn))
 
             if surf.get_masks()[3]:
                 surf.fill(alpha_color)
                 arr = pygame.surfarray.array2d(surf)
-                self.failUnlessEqual(arr[0, 0], map_rgb(alpha_color),
+                posn = (0, 0)
+                self.failUnlessEqual(arr[posn], surf.get_at_mapped(posn),
                                      "%s != %s: bpp: %i" %
-                                     (arr[0, 0],
-                                      map_rgb(alpha_color),
+                                     (arr[posn],
+                                      surf.get_at_mapped(posn),
                                       surf.get_bitsize()))
 
     def test_array3d(self):
@@ -180,20 +180,17 @@ class SurfarrayModuleTest (unittest.TestCase):
 
         for surf in sources:
             arr = pygame.surfarray.array3d(surf)
-            map_rgb = surf.map_rgb
-            unmap_rgb = surf.unmap_rgb
             def same_color(ac, sc):
-                sc = unmap_rgb(map_rgb(sc))
                 return (ac[0] == sc[0] and
                         ac[1] == sc[1] and
                         ac[2] == sc[2])
-            for (x, y), i in self.test_points:
-                self.failUnless(same_color(arr[x, y], palette[i]),
+            for posn, i in self.test_points:
+                self.failUnless(same_color(arr[posn], surf.get_at(posn)),
                                 "%s != %s: flags: %i, bpp: %i, posn: %s" %
-                                (tuple(arr[x, y]),
-                                 unmap_rgb(map_rgb(palette[i])),
+                                (tuple(arr[posn]),
+                                 surf.get_at(posn),
                                  surf.get_flags(), surf.get_bitsize(),
-                                 (x, y)))
+                                 posn))
 
     def test_array_alpha(self):
         if not arraytype:
@@ -498,7 +495,8 @@ class SurfarrayModuleTest (unittest.TestCase):
             return
 
         arr3d = self._make_src_array3d(uint8)
-        targets = [self._make_surface(16),
+        targets = [self._make_surface(8),
+                   self._make_surface(16),
                    self._make_surface(16, srcalpha=True),
                    self._make_surface(24),
                    self._make_surface(32),
@@ -507,17 +505,14 @@ class SurfarrayModuleTest (unittest.TestCase):
 
         for surf in targets:
             arr2d = pygame.surfarray.map_array(surf, arr3d)
-            for (x, y), i in self.test_points:
-                self.failUnlessEqual(arr2d[x, y], surf.map_rgb(palette[i]),
+            for posn, i in self.test_points:
+                self.failUnlessEqual(arr2d[posn], surf.map_rgb(palette[i]),
                                      "%i != %i, bitsize: %i, flags: %i" %
-                                     (arr2d[x, y], surf.map_rgb(palette[i]),
+                                     (arr2d[posn], surf.map_rgb(palette[i]),
                                       surf.get_bitsize(), surf.get_flags()))
 
         # Exception checks
-        def do_map_array(surf, arr):
-            pygame.surfarray.map_array(surf, arr)
-
-        self.failUnlessRaises(ValueError, do_map_array,
+        self.failUnlessRaises(ValueError, pygame.surfarray.map_array,
                               self._make_surface(32),
                               self._make_array2d(uint8))
 
@@ -549,11 +544,8 @@ class SurfarrayModuleTest (unittest.TestCase):
             self._assert_surface(surf)
 
         # Error checks
-        def do_pixels2d(surf):
-            pygame.surfarray.pixels2d(surf)
-
         self.failUnlessRaises(ValueError,
-                              do_pixels2d,
+                              pygame.surfarray.pixels2d,
                               self._make_surface(24))
 
     def test_pixels3d(self):
@@ -644,6 +636,60 @@ class SurfarrayModuleTest (unittest.TestCase):
 
         for bitsize, srcalpha in targets:
             self.failUnlessRaises(ValueError, do_pixels_alpha,
+                                  self._make_surface(bitsize, srcalpha))
+
+    def test_pixels_red(self):
+        self._test_pixels_rgb('red', 0)
+
+    def test_pixels_green(self):
+        self._test_pixels_rgb('green', 1)
+
+    def test_pixels_blue(self):
+        self._test_pixels_rgb('blue', 2)
+
+    def _test_pixels_rgb(self, operation, mask_posn):
+        method_name = "pixels_" + operation
+        if not arraytype:
+            self.fail("no array package installed")
+        # unavailable for 'numeric'
+        if arraytype == 'numeric':
+            self.assertRaises(NotImplementedError,
+                              getattr(pygame.surfarray, method_name), 'r')
+            return
+
+        pixels_rgb = getattr(pygame.surfarray, method_name)
+        palette = [(0, 0, 0, 255),
+                   (5, 13, 23, 255),
+                   (29, 31, 37, 255),
+                   (131, 157, 167, 255),
+                   (179, 191, 251, 255)]
+        plane = [c[mask_posn] for c in palette]
+
+        surf24 = self._make_src_surface(24, srcalpha=False, palette=palette)
+        surf32 = self._make_src_surface(32, srcalpha=False, palette=palette)
+        surf32a = self._make_src_surface(32, srcalpha=True, palette=palette)
+
+        for surf in [surf24, surf32, surf32a]:
+            self.failIf(surf.get_locked())
+            arr = pixels_rgb(surf)
+            self.failUnless(surf.get_locked())
+            surf.unlock()
+            self.failUnless(surf.get_locked())
+
+            for (x, y), i in self.test_points:
+                self.failUnlessEqual(arr[x, y], plane[i])
+
+            del arr
+            self.failIf(surf.get_locked())
+            self.failUnlessEqual(surf.get_locks(), ())
+
+        # Check exceptions.
+        targets = [(8, False),
+                   (16, False),
+                   (16, True)]
+
+        for bitsize, srcalpha in targets:
+            self.failUnlessRaises(ValueError, pixels_rgb,
                                   self._make_surface(bitsize, srcalpha))
 
     def test_use_arraytype(self):
