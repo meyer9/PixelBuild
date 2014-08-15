@@ -1,2 +1,8 @@
-Development/build
-Development/dist
+build
+dist
+PodSixNet
+pygame
+*~
+.DS_Store
+*.pyc
+*.map
