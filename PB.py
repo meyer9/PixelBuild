@@ -12,7 +12,7 @@ import os
 def find(f, seq):
     i=0
     for item in seq:
-        if item==f: 
+        if item==f:
             return i
         i+=1
 
@@ -22,11 +22,11 @@ def ispressing(buttontopleft, buttonbottomright, mousex, mousey):
             return True
     return False
 def trunc(f, n):
-            slen = len('%.*f' % (n, f))
-            try:
-                return int(str(f)[:slen])
-            except:
-                return int(str(f)[:slen-1])
+    slen = len('%.*f' % (n, f))
+    try:
+        return int(str(f)[:slen])
+    except:
+        return int(str(f)[:slen-1])
 
 #----End of Utility Functions----#
 class PixelBuild:
@@ -58,7 +58,7 @@ class PixelBuild:
         #initialize level
         self.level = Level()
         try:
-            #try to load file
+    #try to load file
             self.level.loadFile("level0000.map")
         except:
             # if i cant load file create it from default.map
@@ -68,11 +68,11 @@ class PixelBuild:
             #Spawn either a forest or clearing
             if random.randint(1,8)==1:
                 for i in range(2):
-                    level.spawntree()
+                    self.level.spawntree()
                 del(i)
             else:
                 for i in range(5):
-                    level.spawntree()
+                    self.level.spawntree()
                 del(i)
         # Initialize pygame
         pygame.init()
@@ -114,13 +114,13 @@ class PixelBuild:
         waiting=True
         while waiting:
             for event in pygame.event.get():
-              if event.type == pygame.QUIT:
-                 pygame.quit()
-                 waiting=False
-                 running=False
-              elif event.type == pygame.KEYDOWN:
-                 if event.key == pygame.K_RETURN:
-                    waiting = False
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    waiting=False
+                    running=False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        waiting = False
         self.loading()
     def loading(self):
         #make spritesheet
@@ -183,8 +183,8 @@ class PixelBuild:
         self.currentselectednum=self.invcount[self.currentselected-1]
         if self.dead:
             self.looping=False
-        self.time = pygame.time.get_ticks() 
-        
+        self.time = pygame.time.get_ticks()
+
         self.screen.fill(0)
         self.screen.blit(self.background, (0+self.xoffset, 0+self.yoffset))
         selected = shopitem
@@ -205,7 +205,7 @@ class PixelBuild:
         self.screen.blit(self.character, (400, 300))
         self.screen.blit(self.carrying, (400, 300))
         self.screen.blit(self.shop, (117, 10))
-        font2 = pygame.font.Font("Minecraftia .ttf", 14)
+        font2 = pygame.font.Font("Minecraftia.ttf", 14)
         cointext = font2.render(str(self.coins), True, (0, 0, 0), (127, 127, 127))
         self.screen.blit(cointext, (271, 35))
         self.screen.blit(selected, (132, 18))
@@ -214,13 +214,14 @@ class PixelBuild:
             self.background.fill(0)
         self.chunk1=[str(self.chunk[0]), str(self.chunk[1]), str(self.chunk[2]), str(self.chunk[3])]
         self.timing+=1
+        print(self.monsters)
         for mon in self.monsters:
             monsterstat=mon.update(self.time, 150, self.playerx, self.playery, self.timing)
             if monsterstat==0 and self.godmode==False:
                 self.dead=True
             elif monsterstat>0:
-                self.coins+=1        
-        
+                self.coins+=1
+
         self.background = self.level.render(self.ss)
         self.background.set_colorkey((255, 255, 255))
 
@@ -254,7 +255,7 @@ class PixelBuild:
                         if chunk[2]==0:
                             chunk=[chunk[0]+1, chunk[1], chunk[2], chunk[3]]
                         else:
-                            chunk=[chunk[0], chunk[1], chunk[2]-1, chunk[3]]  
+                            chunk=[chunk[0], chunk[1], chunk[2]-1, chunk[3]]
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                         if os.path.exists("level"+"".join(chunk1)+".map")!=True:
                             open("level"+"".join(chunk1)+".map","w").write(defaultmap)
@@ -268,7 +269,7 @@ class PixelBuild:
                             del(i)
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
-                            screen.blit(background, (0+xoffset, 0+self.yoffset))
+                            screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                             screen.blit(character, (400, 300))
                             pygame.display.flip()
                         else:
@@ -281,13 +282,13 @@ class PixelBuild:
                                 chunk=[chunk[0], chunk[1], chunk[2]-1, chunk[3]]
                             chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                             self.level.loadFile("level"+"".join(chunk1)+".map")
-                            
+
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
-                            screen.blit(background, (0+xoffset, 0+self.yoffset))
+                            screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                             screen.blit(character, (400, 300))
                             pygame.display.flip()
-                            
+
                 if event.key == K_s:
                     try:
                         if self.level.getTile(trunc((self.playerx+16)/32,0), trunc((self.playery+25)/32,0))["name"]=="floor":
@@ -305,7 +306,7 @@ class PixelBuild:
                         if chunk[0]==0:
                             chunk=[chunk[0], chunk[1], chunk[2]+1, chunk[3]]
                         else:
-                            chunk=[chunk[0]-1, chunk[1], chunk[2], chunk[3]]  
+                            chunk=[chunk[0]-1, chunk[1], chunk[2], chunk[3]]
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                         if os.path.exists("level"+"".join(chunk1)+".map")!=True:
                             open("level"+"".join(chunk1)+".map","w").write(defaultmap)
@@ -319,13 +320,13 @@ class PixelBuild:
                             del(i)
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
-                            screen.blit(background, (0+xoffset, 0+self.yoffset))
+                            screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                             screen.blit(character, (400, 300))
                             pygame.display.flip()
                         else:
                             chunk=chunkb
                             chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                            
+
                             self.level.writeConfig("level"+"".join(chunk1)+".map", [])
                             if chunk[0]==0:
                                 chunk=[chunk[0], chunk[1], chunk[2]+1, chunk[3]]
@@ -333,30 +334,30 @@ class PixelBuild:
                                 chunk=[chunk[0]-1, chunk[1], chunk[2], chunk[3]]
                             chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                             self.level.loadFile("level"+"".join(chunk1)+".map")
-                            
+
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
-                            screen.blit(background, (0+xoffset, 0+self.yoffset))
+                            screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                             screen.blit(character, (400, 300))
                             pygame.display.flip()
                 if event.key == K_a:
                     if self.level.getTile(trunc((self.playerx+12)/32,0), trunc((self.playery+16)/32,0))["name"]=="floor" and self.playerx>-5:
                         self.playerx-=5
-                        xoffset+=5
+                        self.xoffset+=5
                     elif self.level.getTile(trunc((self.playerx+12)/32,0), trunc((self.playery+16)/32,0))["name"]=="pool":
-                        xoffset+=3
+                        self.xoffset+=3
                         self.playerx-=3
                     if self.playerx<=-5:
                         self.level.writeConfig("level"+"".join(chunk1)+".map", monsters)
                         screen.fill(0)
                         #Figure out xoffset
                         self.playerx=900
-                        xoffset=-496
+                        self.xoffset=-496
                         chunkb=chunk
                         if chunk[3]==0:
                             chunk=[chunk[0], chunk[1]+1, chunk[2], chunk[3]]
                         else:
-                            chunk=[chunk[0], chunk[1], chunk[2], chunk[3]-1]  
+                            chunk=[chunk[0], chunk[1], chunk[2], chunk[3]-1]
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                         if os.path.exists("level"+"".join(chunk1)+".map")!=True:
                             open("level"+"".join(chunk1)+".map","w").write(defaultmap)
@@ -370,7 +371,7 @@ class PixelBuild:
                             del(i)
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
-                            screen.blit(background, (0+xoffset, 0+self.yoffset))
+                            screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                             screen.blit(character, (400, 300))
                             pygame.display.flip()
                         else:
@@ -383,31 +384,31 @@ class PixelBuild:
                                 chunk=[chunk[0], chunk[1], chunk[2], chunk[3]-1]
                             chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                             self.level.loadFile("level"+"".join(chunk1)+".map")
-                            
+
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
-                            screen.blit(background, (0+xoffset, 0+self.yoffset))
+                            screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                             screen.blit(character, (400, 300))
                             pygame.display.flip()
                 if event.key == K_d:
                     try:
                         if self.level.getTile(trunc((self.playerx+25)/32,0), trunc((self.playery+16)/32,0))["name"]=="floor" and self.playerx<40*32:
-                            xoffset-=5
+                            self.xoffset-=5
                             self.playerx+=5
                         elif self.level.getTile(trunc((self.playerx+25)/32,0), trunc((self.playery+16)/32,0))["name"]=="pool":
-                            xoffset-=3
+                            self.xoffset-=3
                             self.playerx+=3
                     except KeyError:
                         self.level.writeConfig("level"+"".join(chunk1)+".map", monsters)
                         screen.fill(0)
                         #Figure out xoffset
                         self.playerx=0
-                        xoffset=400
+                        self.xoffset=400
                         chunkb=chunk
                         if chunk[1]==0:
                             chunk=[chunk[0], chunk[1], chunk[2], chunk[3]+1]
                         else:
-                            chunk=[chunk[0], chunk[1]-1, chunk[2], chunk[3]]  
+                            chunk=[chunk[0], chunk[1]-1, chunk[2], chunk[3]]
                         chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                         if os.path.exists("level"+"".join(chunk1)+".map")!=True:
                             open("level"+"".join(chunk1)+".map","w").write(defaultmap)
@@ -421,7 +422,7 @@ class PixelBuild:
                             del(i)
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
-                            screen.blit(background, (0+xoffset, 0+self.yoffset))
+                            screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                             screen.blit(character, (400, 300))
                             pygame.display.flip()
                         else:
@@ -434,10 +435,10 @@ class PixelBuild:
                                 chunk=[chunk[0], chunk[1]-1, chunk[2], chunk[3]]
                             chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
                             self.level.loadFile("level"+"".join(chunk1)+".map")
-                            
+
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
-                            screen.blit(background, (0+xoffset, 0+self.yoffset))
+                            screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                             screen.blit(character, (400, 300))
                             pygame.display.flip()
                 if event.key == K_1:
@@ -497,7 +498,7 @@ class PixelBuild:
                                     # client.Client.newdata=["placeblock", []]
                                     background = self.level.render(ss)
                                     background.set_colorkey((255, 255, 255))
-                                    screen.blit(background, (0+xoffset, 0+self.yoffset))
+                                    screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                                     screen.blit(self.currentbox, (0, 536))
                                     screen.blit(character, (400, 300))
                                     screen.blit(shop, (117, 10))
@@ -508,7 +509,7 @@ class PixelBuild:
                                     pygame.display.flip()
 
                         except:
-                            pass 
+                            pass
             elif event.type==MOUSEBUTTONDOWN and event.button==3:
                 try:
                     deletesound.play()
@@ -521,7 +522,7 @@ class PixelBuild:
 
                     background = self.level.render(ss)
                     background.set_colorkey((255, 255, 255))
-                    screen.blit(background, (0+xoffset, 0+self.yoffset))
+                    screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                     screen.blit(self.currentbox, (0, 536))
                     screen.blit(character, (400, 300))
                     for mon in monsters:
