@@ -2,3 +2,4 @@
 ##Dependencies
 - PyGame
 - PodSixNet
+- configobj

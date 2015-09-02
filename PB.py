@@ -211,10 +211,10 @@ class PixelBuild:
         self.timing+=1
         print(self.monsters)
         for mon in self.monsters:
-            monsterstat=mon.update(self.time, 150, self.playerx, self.playery, self.timing)
-            if monsterstat==0 and self.godmode==False:
+            self.monsterstat=mon.update(self.time, 150, self.playerx, self.playery, self.timing)
+            if self.monsterstat==0 and self.godmode==False:
                 self.dead=True
-            elif monsterstat>0:
+            elif self.monsterstat>0:
                 self.coins+=1
 
         self.background = self.level.render(self.ss)
@@ -225,8 +225,8 @@ class PixelBuild:
 
         for event in pygame.event.get():
             if event.type==QUIT:
-                chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                self.level.writeConfig("level"+"".join(chunk1)+".map", monsters,True, invcount, player=(self.playerx, self.playery))
+                self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                self.level.writeConfig("level"+"".join(self.chunk1)+".map", self.monsters,True, invcount, player=(self.playerx, self.playery))
                 pygame.quit()
                 running=False
                 sys.exit()
@@ -241,7 +241,7 @@ class PixelBuild:
                             self.yoffset+=3
                             self.playery-=3
                     else:
-                        self.level.writeConfig("level"+"".join(chunk1)+".map", monsters)
+                        self.level.writeConfig("level"+"".join(self.chunk1)+".map", self.monsters)
                         #1280, -980, 2
                         screen.fill(0)
                         self.playery=1280
@@ -251,10 +251,10 @@ class PixelBuild:
                             chunk=[chunk[0]+1, chunk[1], chunk[2], chunk[3]]
                         else:
                             chunk=[chunk[0], chunk[1], chunk[2]-1, chunk[3]]
-                        chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        if os.path.exists("level"+"".join(chunk1)+".map")!=True:
-                            open("level"+"".join(chunk1)+".map","w").write(defaultmap)
-                            self.level.loadFile("level"+"".join(chunk1)+".map")
+                        self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                        if os.path.exists("level"+"".join(self.chunk1)+".map")!=True:
+                            open("level"+"".join(self.chunk1)+".map","w").write(defaultmap)
+                            self.level.loadFile("level"+"".join(self.chunk1)+".map")
                             if random.randint(1,2)==1:
                                 for i in range(5):
                                     level.spawntree()
@@ -269,14 +269,14 @@ class PixelBuild:
                             pygame.display.flip()
                         else:
                             chunk=chunkb
-                            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                            self.level.writeConfig("level"+"".join(chunk1)+".map", [])
+                            self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                            self.level.writeConfig("level"+"".join(self.chunk1)+".map", [])
                             if chunk[2]==0:
                                 chunk=[chunk[0]+1, chunk[1], chunk[2], chunk[3]]
                             else:
                                 chunk=[chunk[0], chunk[1], chunk[2]-1, chunk[3]]
-                            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                            self.level.loadFile("level"+"".join(chunk1)+".map")
+                            self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                            self.level.loadFile("level"+"".join(self.chunk1)+".map")
 
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
@@ -293,7 +293,7 @@ class PixelBuild:
                             self.yoffset-=3
                             self.playery+=3
                     except KeyError:
-                        self.level.writeConfig("level"+"".join(chunk1)+".map", monsters)
+                        self.level.writeConfig("level"+"".join(self.chunk1)+".map", self.monsters)
                         screen.fill(0)
                         self.playery=0
                         self.yoffset=300
@@ -302,10 +302,10 @@ class PixelBuild:
                             chunk=[chunk[0], chunk[1], chunk[2]+1, chunk[3]]
                         else:
                             chunk=[chunk[0]-1, chunk[1], chunk[2], chunk[3]]
-                        chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        if os.path.exists("level"+"".join(chunk1)+".map")!=True:
-                            open("level"+"".join(chunk1)+".map","w").write(defaultmap)
-                            self.level.loadFile("level"+"".join(chunk1)+".map")
+                        self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                        if os.path.exists("level"+"".join(self.chunk1)+".map")!=True:
+                            open("level"+"".join(self.chunk1)+".map","w").write(defaultmap)
+                            self.level.loadFile("level"+"".join(self.chunk1)+".map")
                             if random.randint(1,2)==1:
                                 for i in range(5):
                                     self.level.spawntree()
@@ -320,15 +320,15 @@ class PixelBuild:
                             pygame.display.flip()
                         else:
                             chunk=chunkb
-                            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                            self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
 
-                            self.level.writeConfig("level"+"".join(chunk1)+".map", [])
+                            self.level.writeConfig("level"+"".join(self.chunk1)+".map", [])
                             if chunk[0]==0:
                                 chunk=[chunk[0], chunk[1], chunk[2]+1, chunk[3]]
                             else:
                                 chunk=[chunk[0]-1, chunk[1], chunk[2], chunk[3]]
-                            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                            self.level.loadFile("level"+"".join(chunk1)+".map")
+                            self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                            self.level.loadFile("level"+"".join(self.chunk1)+".map")
 
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
@@ -343,7 +343,7 @@ class PixelBuild:
                         self.xoffset+=3
                         self.playerx-=3
                     if self.playerx<=-5:
-                        self.level.writeConfig("level"+"".join(chunk1)+".map", monsters)
+                        self.level.writeConfig("level"+"".join(self.chunk1)+".map", self.monsters)
                         screen.fill(0)
                         #Figure out xoffset
                         self.playerx=900
@@ -353,10 +353,10 @@ class PixelBuild:
                             chunk=[chunk[0], chunk[1]+1, chunk[2], chunk[3]]
                         else:
                             chunk=[chunk[0], chunk[1], chunk[2], chunk[3]-1]
-                        chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        if os.path.exists("level"+"".join(chunk1)+".map")!=True:
-                            open("level"+"".join(chunk1)+".map","w").write(defaultmap)
-                            self.level.loadFile("level"+"".join(chunk1)+".map")
+                        self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                        if os.path.exists("level"+"".join(self.chunk1)+".map")!=True:
+                            open("level"+"".join(self.chunk1)+".map","w").write(defaultmap)
+                            self.level.loadFile("level"+"".join(self.chunk1)+".map")
                             if random.randint(1,2)==1:
                                 for i in range(5):
                                     self.level.spawntree()
@@ -371,14 +371,14 @@ class PixelBuild:
                             pygame.display.flip()
                         else:
                             chunk=chunkb
-                            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                            self.level.writeConfig("level"+"".join(chunk1)+".map", [])
+                            self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                            self.level.writeConfig("level"+"".join(self.chunk1)+".map", [])
                             if chunk[3]==0:
                                 chunk=[chunk[0], chunk[1]+1, chunk[2], chunk[3]]
                             else:
                                 chunk=[chunk[0], chunk[1], chunk[2], chunk[3]-1]
-                            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                            self.level.loadFile("level"+"".join(chunk1)+".map")
+                            self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                            self.level.loadFile("level"+"".join(self.chunk1)+".map")
 
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
@@ -394,7 +394,7 @@ class PixelBuild:
                             self.xoffset-=3
                             self.playerx+=3
                     except KeyError:
-                        self.level.writeConfig("level"+"".join(chunk1)+".map", monsters)
+                        self.level.writeConfig("level"+"".join(self.chunk1)+".map", self.monsters)
                         screen.fill(0)
                         #Figure out xoffset
                         self.playerx=0
@@ -404,10 +404,10 @@ class PixelBuild:
                             chunk=[chunk[0], chunk[1], chunk[2], chunk[3]+1]
                         else:
                             chunk=[chunk[0], chunk[1]-1, chunk[2], chunk[3]]
-                        chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                        if os.path.exists("level"+"".join(chunk1)+".map")!=True:
-                            open("level"+"".join(chunk1)+".map","w").write(defaultmap)
-                            self.level.loadFile("level"+"".join(chunk1)+".map")
+                        self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                        if os.path.exists("level"+"".join(self.chunk1)+".map")!=True:
+                            open("level"+"".join(self.chunk1)+".map","w").write(defaultmap)
+                            self.level.loadFile("level"+"".join(self.chunk1)+".map")
                             if random.randint(1,2)==1:
                                 for i in range(5):
                                     self.level.spawntree()
@@ -422,14 +422,14 @@ class PixelBuild:
                             pygame.display.flip()
                         else:
                             chunk=chunkb
-                            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                            self.level.writeConfig("level"+"".join(chunk1)+".map", [])
+                            self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                            self.level.writeConfig("level"+"".join(self.chunk1)+".map", [])
                             if chunk[1]==0:
                                 chunk=[chunk[0], chunk[1], chunk[2], chunk[3]+1]
                             else:
                                 chunk=[chunk[0], chunk[1]-1, chunk[2], chunk[3]]
-                            chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                            self.level.loadFile("level"+"".join(chunk1)+".map")
+                            self.chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
+                            self.level.loadFile("level"+"".join(self.chunk1)+".map")
 
                             background = self.level.render(ss)
                             background.set_colorkey((255, 255, 255))
@@ -499,7 +499,7 @@ class PixelBuild:
                                     screen.blit(shop, (117, 10))
                                     screen.blit(cointext, (550, 25))
                                     invcount[currentselected-1]-=1
-                                    for mon in monsters:
+                                    for mon in self.monsters:
                                         background.blit(mon.image, (mon.rect[0],mon.rect[1]))
                                     pygame.display.flip()
 
@@ -520,7 +520,7 @@ class PixelBuild:
                     screen.blit(background, (0+self.xoffset, 0+self.yoffset))
                     screen.blit(self.currentbox, (0, 536))
                     screen.blit(character, (400, 300))
-                    for mon in monsters:
+                    for mon in self.monsters:
                         background.blit(mon.image, (mon.rect[0],mon.rect[1]))
                     pygame.display.flip()
                 except TypeError:
