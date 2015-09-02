@@ -1,6 +1,5 @@
 import random
 import os, pygame, sys
-import pygame._view
 from pygame.locals import *
 import spritesheet
 import sound

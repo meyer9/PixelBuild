@@ -5,6 +5,7 @@ import spritesheet
 import sound
 import math
 import client
+import time as time1
 from monster import Monster
 from map import Level
 def find(f, seq):
@@ -17,7 +18,7 @@ pygame.mixer.init()
 waiting = True
 running = True
 coins=0
-# c=client.Client()
+c=client.Client(sys.argv[0].split(":")[0], sys.argv[0].split(":")[1])
 placesound=pygame.mixer.Sound("place.wav")
 deletesound=pygame.mixer.Sound("delete.wav")
 icon = pygame.image.load("Game.bmp")
@@ -108,11 +109,12 @@ if running:
     currentbox.fill((255,255,255))
     running=True
     dead=False
+    c.Loop()
 
 while running:
-    # client.Loop()
-    # if len(self.blockdata)>1:
-    #     print block
+    c.Loop()
+    if len(c.blockdata)>1:
+        level.setTile(c.blockdata['data'][0], c.blockdata['data'][1], c.blockdata['data'][2])
     currentbox.fill((255,255,255))
     currentselectednum=invcount[currentselected-1]
     if dead:
@@ -148,7 +150,7 @@ while running:
             dead=True
         elif monsterstat==1:
             coins+=2
-            print(coins)
+            print coins
         
     
     background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
@@ -185,7 +187,7 @@ while running:
                     else:
                         chunk=[chunk[0], chunk[1], chunk[2]-1, chunk[3]]  
                     chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                    print("level"+"".join(chunk1)+".map")
+                    print "level"+"".join(chunk1)+".map"
                     if os.path.exists("level"+"".join(chunk1)+".map")!=True:
                         open("level"+"".join(chunk1)+".map","w").write(defaultmap)
                         level.loadFile("level"+"".join(chunk1)+".map")
@@ -388,7 +390,7 @@ while running:
     # KeyError: 'name'
                         if level.getTile(trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), False)!=inv[currentselected-1]:
                             level.setTile(trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), str(inv[currentselected-1]))
-                            # client.Client.newdata=["placeblock", []]
+                            c.newdata={"action":"placeblock", "data":[trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), str(inv[currentselected-1])]}
                             background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
                             background.set_colorkey((255, 255, 255))
                             screen.blit(background, (0+xoffset, 0+yoffset))
@@ -408,9 +410,10 @@ while running:
                 invcount[find(level.getTile(trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), False), inv)]+=1
                 if level.getTile(trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0))['name']!='floor':
                     level.setTile(trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), "g")
+                    c.newdata={"action":"placeblock", "data":[trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), "g"]}
                 else:
                     level.setTile(trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), "7")
-                
+                    c.newdata={"action":"placeblock", "data":[trunc(((mouse[0]*1.0/32))+playerx*1.0/32, 0), trunc(((mouse[1]*1.0/32))+playery*1.0/32,0), "7"]}            
                 background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
                 background.set_colorkey((255, 255, 255))
                 screen.blit(background, (0+xoffset, 0+yoffset))
@@ -421,6 +424,7 @@ while running:
                 pygame.display.flip()
             except:
                 pass
+        time1.sleep(.01)
 once = 1
 while 1:
     if once>0:

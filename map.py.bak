@@ -1,11 +1,10 @@
 #Handles the map parsing
-import configparser
+import ConfigParser
 import pygame
 import time
 import gzip
 import random
 import os
-import io
 from configobj import ConfigObj
 class Level(object):
     def spawntree(self):
@@ -34,9 +33,8 @@ class Level(object):
         self.map = []
         self.key = {}
         self.monsters = {}
-        parser = configparser.ConfigParser()
-        f = io.TextIOWrapper(gzip.open(filename, 'rb'))
-        parser.read_file(f, filename)
+        parser = ConfigParser.ConfigParser()
+        parser.readfp(gzip.open(filename, 'rb'))
         self.map = parser.get("level", "map").replace('""', "").replace("'''","").split("\n")
         tmpMap = []
         for line in self.map:
@@ -47,7 +45,7 @@ class Level(object):
             if section.startswith("mon"):
                 desc = dict(parser.items(section))
                 self.monsters[section] = desc
-
+        
         self.key={'wf':{'tile':'3, 16', 'name':'floor'},'le':{'tile':'2, 13', 'name':'wall'}, 'w':{'tile':'1, 9', 'name':'wall'}, 'tr':{'tile':'4, 16', 'name':'trap'},'g':{'tile':'2, 5', 'name':'floor'},'q': {'tile': '4, 8', 'name': 'pool'}, 'b': {'tile': '3, 4', 'name': 'wall'}, 'd': {'tile': '4, 14', 'name': 'floor'}, 'cd': {'tile': '4, 13', 'name': 'floor'}, 'i': {'tile': '1, 13', 'name': 'ice'}, '1': {'tile': '1, 1', 'name': 'wall'}, '0': {'tile': '2, 3', 'name': 'wall'}, '3': {'tile': '3, 1', 'name': 'wall'}, '2': {'tile': '2, 1', 'name': 'wall'}, '5': {'tile': '1, 2', 'name': 'wall'}, 't': {'tile': '2, 8', 'name': 'floor'}, '7': {'tile': '3, 2', 'name': 'floor'}, '6': {'tile': '2, 2', 'name': 'wall'}, '9': {'tile': '1, 3', 'name': 'wall'}, '8': {'tile': '4, 2', 'name': 'wall'}, '4': {'tile': '4, 1', 'name': 'wall'}}
         try:
             self.inventory=parser.get("player", "inventory")
@@ -62,7 +60,7 @@ class Level(object):
         try:
             self.playerx=parser.get("player", "x")
             self.playery=parser.get("player", "y")
-            print("Found player")
+            print "Found player"
         except:
             self.playerx, self.playery=400, 300
         self.width = len(self.map[0])
@@ -89,8 +87,8 @@ class Level(object):
             return True
         else:
             return False
-
-
+    
+    
     def renderRow(self, row, spritesheet):
         index=0
         image = pygame.Surface((self.width*32, 32))
@@ -98,7 +96,7 @@ class Level(object):
             coord = self.key[column]["tile"].split(", ")
             tile = spritesheet.image_at(pygame.rect.Rect((int(coord[0])-1)*32, (int(coord[1])-1)*32, 32, 32))
             image.blit(tile, (index*32, 0))
-            index+=1
+            index+=1        
         return image
 
     def render(self, spritesheet):
@@ -120,12 +118,12 @@ class Level(object):
         index=0
         config["player"]={}
         if invcount!=None:
-            print("inv:",invcount)
-            print("player:",player)
+            print "inv:",invcount
+            print "player:",player
             config["player"]={"inventory":invcount}
         if player!=None:
-            config["player"]=dict(config["player"],**{"x":player[0]})
-            config["player"]=dict(config["player"],**{"y":player[1]})
+            config["player"]=dict(config["player"],**{"x":player[0]})   
+            config["player"]=dict(config["player"],**{"y":player[1]})             
         if savemon:
             for mon in monsters:
                 config["mon"+str(index)]={"x":mon.rect.left, "y":mon.rect.top}
@@ -144,3 +142,4 @@ class Level(object):
         f_out.writelines(level124)
         f_out.close()
         level124.close()
+

@@ -148,7 +148,7 @@ while running:
             dead=True
         elif monsterstat==1:
             coins+=2
-            print(coins)
+            print coins
         
     
     background = level.render(spritesheet.spritesheet("spritesheet.bmp"))
@@ -185,7 +185,7 @@ while running:
                     else:
                         chunk=[chunk[0], chunk[1], chunk[2]-1, chunk[3]]  
                     chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-                    print("level"+"".join(chunk1)+".map")
+                    print "level"+"".join(chunk1)+".map"
                     if os.path.exists("level"+"".join(chunk1)+".map")!=True:
                         open("level"+"".join(chunk1)+".map","w").write(defaultmap)
                         level.loadFile("level"+"".join(chunk1)+".map")

@@ -21,11 +21,11 @@ class ClientChannel(Channel):
 	##################################
 	
 	def Network_placeblock(self, data):
-		print("blocks!")
+		print "blocks!"
 		self._server.SendToAll({"action": "placedblock", "data":data["data"]})
 	
 	def Network_nicknamerequest(self, data):
-		print("receive")
+		print "receive"
 		if len(self.nickname)!=0:
 			self.nickname.append(int(self.nickname[-1])+1)
 			self.Send({"action":"nicknamereceive"})
@@ -38,19 +38,19 @@ class ChatServer(Server):
 	def __init__(self, *args, **kwargs):
 		Server.__init__(self, *args, **kwargs)
 		self.players = WeakKeyDictionary()
-		print('Server launched')
+		print 'Server launched'
 	
 	def Connected(self, channel, addr):
 		self.AddPlayer(channel)
 	
 	def AddPlayer(self, player):
-		print("New Player" + str(player.addr))
+		print "New Player" + str(player.addr)
 		self.players[player] = True
 		self.SendPlayers()
-		print("players", [p for p in self.players])
+		print "players", [p for p in self.players]
 	
 	def DelPlayer(self, player):
-		print("Deleting Player" + str(player.addr))
+		print "Deleting Player" + str(player.addr)
 		del self.players[player]
 		self.SendPlayers()
 	
