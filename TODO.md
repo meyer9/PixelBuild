@@ -1,5 +1,5 @@
 #Giant Todo List of Scariness
 [ ] Convert All Code to OOP
-[ ] Remove Excess Files
-[ ] Finish .gitignore
-[ ] Organize Code and Assets into Folders
+[X] Remove Excess Files
+[X] Finish .gitignore
+[X] Organize Code and Assets into Folders

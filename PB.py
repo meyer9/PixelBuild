@@ -38,7 +38,7 @@ class PixelBuild:
         #looping
         self.looping=True
         #set variable shop for shop image
-        self.shop = pygame.image.load("shop.bmp")
+        self.shop = pygame.image.load("sprites/shop.bmp")
         self.shop.set_colorkey((255,255,255))
         #initialize if running or not
         self.running = True
@@ -47,10 +47,10 @@ class PixelBuild:
         #cheating!!!!
         self.godmode=False
         #sounds...
-        self.placesound=pygame.mixer.Sound("place.wav")
-        self.deletesound=pygame.mixer.Sound("delete.wav")
+        self.placesound=pygame.mixer.Sound("sounds/place.wav")
+        self.deletesound=pygame.mixer.Sound("sounds/delete.wav")
         #game icon
-        self.icon = pygame.image.load("game.bmp")
+        self.icon = pygame.image.load("sprites/game.bmp")
         #set alpha color
         self.icon.set_colorkey((0,0,0))
         #set icon
@@ -124,7 +124,7 @@ class PixelBuild:
         self.loading()
     def loading(self):
         #make spritesheet
-        self.ss=spritesheet.spritesheet("spritesheet.bmp")
+        self.ss=spritesheet.spritesheet("sprites/spritesheet.bmp")
         #render the background
         self.background = self.level.render(self.ss)
         self.background.set_colorkey((255, 255, 255))
@@ -168,11 +168,6 @@ class PixelBuild:
         self.running=True
         self.dead=False
         self.update()
-        # invcount=level.inventory
-        # self.playerx=int(level.self.playerx)
-        # self.playery=int(level.self.playery)
-        # xoffset=((self.playerx-400)/5)*-5
-        # self.yoffset=((self.playerx-300)/5)*-5
     def update(self):
         #update shop item
         shopitem=self.ss.image_at(pygame.rect.Rect(((int(self.level.key[str(self.inv[self.currentselected-1])]['tile'].split(", ")[0])-1)*32, (int(self.level.key[str(self.inv[self.currentselected-1])]['tile'].split(", ")[1])-1)*32, 32, 32)))
@@ -205,7 +200,7 @@ class PixelBuild:
         self.screen.blit(self.character, (400, 300))
         self.screen.blit(self.carrying, (400, 300))
         self.screen.blit(self.shop, (117, 10))
-        font2 = pygame.font.Font("Minecraftia.ttf", 14)
+        font2 = pygame.font.Font("fonts/Minecraftia.ttf", 14)
         cointext = font2.render(str(self.coins), True, (0, 0, 0), (127, 127, 127))
         self.screen.blit(cointext, (271, 35))
         self.screen.blit(selected, (132, 18))
@@ -486,9 +481,9 @@ class PixelBuild:
                 elif ispressing((358,16), (501, 52), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
                     if coins>0:
                         coins-=1
-                        invcount[currentselected-1]+=5
+                        self.invcount[currentselected-1]+=5
                 else:
-                    if invcount[currentselected-1]>0:
+                    if self.invcount[currentselected-1]>0:
                         placesound.play()
                         mouse=[pygame.mouse.get_pos()[0]-400, pygame.mouse.get_pos()[1]-300]
                         try:
@@ -535,42 +530,3 @@ class PixelBuild:
         if self.looping:
             self.update()
 p=PixelBuild()
-# once = 1
-# if running:
-#     while 1:
-#         if once>0:
-#             n =  screen.convert_alpha()
-#             # red at 50%
-#             n.fill((255,0,0,127))
-#             screen.blit(n, (0,0))
-#             pygame.display.flip()
-#             once-=1
-#         font1 = pygame.font.Font(None, 72)
-#         text1 = font1.render('Game Over', True, (255, 255, 255))
-#         textRect1 = text1.get_rect()
-#         textRect1.centerx = screen.get_rect().centerx
-#         textRect1.y = 100
-#         screen.blit(text1, textRect1)
-
-#         # Add "Press <Enter> To Play"
-#         font2 = pygame.font.Font(None, 17)
-#         text2 = font2.render('Press <Enter> To Restart or Close Window to Quit', True, (255, 255, 255))
-#         textRect2 = text2.get_rect()
-#         textRect2.centerx = screen.get_rect().centerx
-#         textRect2.y = 150
-#         screen.blit(text2, textRect2)
-#         pygame.display.flip()
-#         for event in pygame.event.get():
-#             if event.type==QUIT:
-#                 chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-#                 level.writeConfig("level"+"".join(chunk1)+".map", monsters, False, invcount, (self.playerx, self.playery))
-#                 pygame.quit()
-#                 running=False
-#                 sys.exit()
-#             elif event.type == pygame.KEYDOWN:
-#                 if event.key == pygame.K_RETURN:
-#                     chunk1=[str(chunk[0]), str(chunk[1]), str(chunk[2]), str(chunk[3])]
-#                     level.writeConfig("level"+"".join(chunk1)+".map", monsters, False, invcount, (self.playerx, self.playery))
-#                     pygame.quit()
-#                     running=False
-#                     restart_program()

@@ -1,4 +1,3 @@
-#A function to load sounds
 def loadSound(name):
     class NoneSound:
         def play(self): pass
