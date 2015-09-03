@@ -1,8 +1,8 @@
-build
-dist
-PodSixNet
-pygame
-*~
-.DS_Store
+level*.map
+*.bak
 *.pyc
-*.map
+**/.DS_Store
+build/
+__pycache__
+dist
+*temp*
